@@ -83,6 +83,7 @@ select = [
 
 ignore = [
     "F403", # 'from module import *' used; unable to detect undefined names
+    "PLR2004"
 ]
 
 fixable = ["ALL"]
