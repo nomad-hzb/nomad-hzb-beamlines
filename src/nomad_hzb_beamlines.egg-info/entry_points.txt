@@ -1,3 +1,2 @@
 [nomad.plugin]
-parser_entry_point = nomad_hzb_beamlines.parsers:parser_entry_point
-schema_package_entry_point = nomad_hzb_beamlines.schema_packages:schema_package_entry_point
+beamline_package_entry_point = nomad_hzb_beamlines.schema_packages:beamline_package_entry_point

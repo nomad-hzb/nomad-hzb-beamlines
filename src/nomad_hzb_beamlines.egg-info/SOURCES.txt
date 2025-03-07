@@ -27,8 +27,6 @@ src/nomad_hzb_beamlines.egg-info/dependency_links.txt
 src/nomad_hzb_beamlines.egg-info/entry_points.txt
 src/nomad_hzb_beamlines.egg-info/requires.txt
 src/nomad_hzb_beamlines.egg-info/top_level.txt
-src/nomad_hzb_beamlines/parsers/__init__.py
-src/nomad_hzb_beamlines/parsers/parser.py
 src/nomad_hzb_beamlines/schema_packages/__init__.py
 src/nomad_hzb_beamlines/schema_packages/beamline_package.py
 tests/conftest.py
