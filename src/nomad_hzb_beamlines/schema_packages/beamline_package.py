@@ -173,7 +173,8 @@ class Beamline_Sample(CompositeSystem, EntryData):
 
         if not archive.results.material:
             archive.results.material = Material()
-        archive.results.material.elements = []
+        if not archive.results.material.elements:
+            archive.results.material.elements = []
 
         result_data = collectSampleData(archive)
         for _, process in result_data.items():
