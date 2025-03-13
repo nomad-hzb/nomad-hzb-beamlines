@@ -94,7 +94,6 @@ class Substrate(ArchiveSection):
 class Beamline_Sample(CompositeSystem, EntryData):
     m_def = Section(
         a_eln=dict(
-            hide=['users', 'elemental_composition', 'components'],
             properties=dict(
                 order=[
                     'name',
