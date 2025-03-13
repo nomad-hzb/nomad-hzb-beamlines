@@ -23,6 +23,7 @@ from nomad.datamodel.metainfo.basesections import (
     CompositeSystem,
     CompositeSystemReference,
 )
+from nomad.datamodel.results import Material
 from nomad.metainfo import Quantity, SchemaPackage, Section, SubSection
 from unidecode import unidecode
 
@@ -91,6 +92,51 @@ class Substrate(ArchiveSection):
     )
 
 
+def collectSampleData(archive):
+    # This function gets all archives whcih reference this archive.
+    # Iterates over them and selects relevant data for the
+    # result section of the solarcellsample
+    # At the end the synthesis steps are ordered
+    # returns a dictionary containing synthesis process, JV and EQE information
+
+    from nomad import files
+    from nomad.app.v1.models import MetadataPagination
+    from nomad.search import search
+
+    # search for all archives referencing this archive
+    query = {
+        'entry_references.target_entry_id': archive.metadata.entry_id,
+    }
+    pagination = MetadataPagination()
+    pagination.page_size = 100
+    search_result = search(
+        owner='all',
+        query=query,
+        pagination=pagination,
+        user_id=archive.metadata.main_author.user_id,
+    )
+    entry = {}
+    for res in search_result.data:
+        try:
+            # Open Archives
+            with files.UploadFiles.get(upload_id=res['upload_id']).read_archive(
+                entry_id=res['entry_id']
+            ) as arch:
+                entry_id = res['entry_id']
+                entry.update({entry_id: {}})
+                try:
+                    entry[entry_id]['elements'] = arch[entry_id]['results']['material'][
+                        'elements'
+                    ]
+                except BaseException:
+                    entry[entry_id]['elements'] = []
+
+        except Exception as e:
+            print('Error in processing data: ', e)
+
+    return entry
+
+
 class Beamline_Sample(CompositeSystem, EntryData):
     m_def = Section(
         a_eln=dict(
@@ -124,6 +170,17 @@ class Beamline_Sample(CompositeSystem, EntryData):
                 pass
             self.lab_id = create_id(archive, str(first_short) + str(last_short))
         export_lab_id(archive, self.lab_id)
+
+        if not archive.results.material:
+            archive.results.material = Material()
+        archive.results.material.elements = []
+
+        result_data = collectSampleData(archive)
+        for _, process in result_data.items():
+            if not process['elements']:
+                continue
+            archive.results.material.elements.extend(process['elements'])
+        archive.results.material.elements = list(set(archive.results.material.elements))
 
 
 m_package.__init_metainfo__()
